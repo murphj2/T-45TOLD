@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<!--
+To change this license header, choose License Headers in Project Properties.
+To change this template file, choose Tools | Templates
+and open the template in the editor.
+-->
+<html>
+    <head>
+        <meta charset="utf-8"/>
+        <link rel="icon" href="/favicon.ico"/>
+        <meta name="viewport" content="width=device-width,initial-scale=1"/>
+        <meta name="theme-color" content="#000000"/>
+        <meta name="description" content="T-45C Goshawk TOLD data for KNQI, KNMM, KNJK"/>
+        <link rel="apple-touch-icon" href="/logo192.png"/>
+        <link rel="manifest" href="/manifest.json"/>
+        <title>T-45C TOLD</title>
+        <link href="css/main.94b78f7c.chunk.css" rel="stylesheet">
+    </head>
+    <div>
+        
+        <p>Page refreshed at: <data value="" id=refreshtime></p>
+        <h1>Kingsville METAR</h1>
+        <p id=k_metar>NULL</p>
+        <p style="color: red"><b><data id=k_metar_warn></data></b></p>
+        <h2></h2>
+        <p>RPM: <data value="" id=k_rpm></data>%</p>
+        <p>Line Speed <b>Half</b> Flaps: <data value="" id=k_line_half></data> KCAS</p>
+        <p>Line Speed Full Flaps: <data value="" id=k_line_full></data> KCAS</p>
+        <p>Section Line Speed: <data value="" id=k_line_section></data> KCAS</p>
+        <p>Takeoff Distance <b>Half</b> Flaps: <data value="" id=k_TO_normal_half></data> feet</p>
+        <p>Takeoff Distance Full Flaps: <data value="" id=k_TO_normal_full></data> feet</p>
+        <p>Section Takeoff Distance: <data value="" id=k_TO_section></data> feet</p>
+        <p>Abort Dry <b>Half</b> Flaps: <data value="" id=k_abort_dry_half></data> KCAS</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(–3 for section)</p>
+        <p>Abort Dry Full Flaps: <data value="" id=k_abort_dry_full></data> KCAS</p>
+        <p>Abort Wet <b>Half</b> Flaps: <data value="" id=k_abort_wet_half></data> KCAS</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(–1 for section)</p>
+        <p>Abort Wet Full Flaps: <data value="" id=k_abort_wet_full></data> KCAS</p>
+        <p>Min RPM at MRT (within 7 seconds): <data value="" id=k_minRPM></data>%</p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <h1>Meridian METAR</h1>
+        <p></p>
+        <p id=m_metar>NULL</p>
+        <p style="color: red"><b><data id=m_metar_warn></data></b></p>
+        <h2></h2>
+        <p>RPM: <data value="" id=m_rpm></data>%</p>
+        <p>Line Speed <b>Half</b> Flaps: <data value="" id=m_line_half></data> KCAS</p>
+        <p>Line Speed Full Flaps: <data value="" id=m_line_full></data> KCAS</p>
+        <p>Section Line Speed: <data value="" id=m_line_section></data> KCAS</p>
+        <p>Takeoff Distance <b>Half</b> Flaps: <data value="" id=m_TO_normal_half></data> feet</p>
+        <p>Takeoff Distance Full Flaps: <data value="" id=m_TO_normal_full></data> feet</p>
+        <p>Section Takeoff Distance: <data value="" id=m_TO_section></data> feet</p>
+        <p>Abort Dry <b>Half</b> Flaps: <data value="" id=m_abort_dry_half></data> KCAS</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(–3 for section)</p>
+        <p>Abort Dry Full Flaps: <data value="" id=m_abort_dry_full></data> KCAS</p>
+        <p>Abort Wet <b>Half</b> Flaps: <data value="" id=m_abort_wet_half></data> KCAS</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(–1 for section)</p>
+        <p>Abort Wet Full Flaps: <data value="" id=m_abort_wet_full></data> KCAS</p>
+        <p>Min RPM at MRT (within 7 seconds): <data value="" id=m_minRPM></data>%</p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <h1>El Centro METAR</h1>
+        <p></p>
+        <p id=c_metar></p>
+        <p style="color: red" id="k_warn_color"><b><data id=c_metar_warn></data></b></p>
+        <h2></h2>
+        <p>RPM: <data value="" id=c_rpm></data>%</p>
+        <p>Line Speed <b>Half</b> Flaps: <data value="" id=c_line_half></data> KCAS</p>
+        <p>Line Speed Full Flaps: <data value="" id=c_line_full></data> KCAS</p>
+        <p>Section Line Speed: <data value="" id=c_line_section></data> KCAS</p>
+        <p>Takeoff Distance <b>Half</b> Flaps: <data value="" id=c_TO_normal_half></data> feet</p>
+        <p>Takeoff Distance Full Flaps: <data value="" id=c_TO_normal_full></data> feet</p>
+        <p>Section Takeoff Distance: <data value="" id=c_TO_section></data> feet</p>
+        <p><b>*El Centro abort data calculated using 9.5k runway.*</b></p>
+        <p>Abort Dry <b>Half</b> Flaps: <data value="" id=c_abort_dry_half></data> KCAS</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(–3 for section)</p>
+        <p>Abort Wet <b>Half</b> Flaps: <data value="" id=c_abort_wet_half></data> KCAS</p>
+        <p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(–1 for section)</p>
+        <p>Min RPM at MRT (within 7 seconds): <data value="" id=c_minRPM></data>%</p>
+        <p></p>
+        <br>
+        <br>
+        <hr>
+        <br>
+        <br>
+        <p>Enter Airport ID
+            <label class="switch">
+                <input type="checkbox" onchange="dataEnterMethod()" id="entryMethod">
+                <span class="slider round"></span>
+            </label>
+            Enter Manual Data</p>
+        <br>
+
+        <!-- Airport Data Entry -->
+        <div id="airportData">
+            <label for=stationID>Station ID: </label>
+            <input id=stationID name=stationID maxlength="4" placeholder="K***" onkeydown=search()>
+            <p></p>
+            <label for="runwaylength">Runway Length: </label>
+            <input id=runwayLength type="number" min="2000" max="10000" step="100"  value="8000" oninput=updateAll()>
+            <p></p>
+            <data value="" id="RLWarning1"></data>
+            <p></p>
+            <button id=getICAOinfo onclick=updateAll()>Submit</button>
+        </div>
+
+        <!-- Manual Data Entry -->
+        <div id="manualData">
+            <label for="fieldElev">Field Elevation (MSL): </label>
+            <input id=fieldElev type="number" value="50" oninput=updateManualAll() max="15000">
+            <p></p>
+            <label for="altimeter">Altimeter: </label>
+            <input id=altimeter type="number" min="27" max="32" step="0.01"  value="29.92" oninput=updateManualAll()>
+            <p></p>
+            <label for=Temperature>Temperature: </label>
+            <input id=temperatureManual name=stationID type="number" value="15" oninput=updateManualAll()>°F<label class="switch">
+                <input type="checkbox" id="cORf" checked="checked" onchange=updateManualAll()>
+                <span class="slider round"></span>
+            </label>°C
+            <p></p>
+            <label for="runwaylength">Runway Length: </label>
+            <input id=runwayLengthManual type="number" min="2000" max="10000" step="100"  value="8000" oninput=updateManualAll()>
+            <p></p>
+            <data value="" id="RLWarning2"></data>
+            <p></p>
+            <button id=getManualinfo onclick=updateManualAll()>Submit</button>
+            <p></p>
+        </div>
+
+        <h1><data value="" id=q_ICAO>NULL METAR</data></h1>
+        <p></p>
+        <p id=q_metar></p>
+        <p style="color: red"><b><data id=q_metar_warn></data></b></p>
+        <h2></h2>
+        <p>RPM: <data value="" id=q_rpm></data>%</p>
+        <p>Line Speed <b>Half</b> Flaps: <data value="" id=q_line_half></data> KCAS</p>
+        <p>Line Speed Full Flaps: <data value="" id=q_line_full></data> KCAS</p>
+        <p>Section Line Speed: <data value="" id=q_line_section></data> KCAS</p>
+        <p>Takeoff Distance <b>Half</b> Flaps: <data value="" id=q_TO_normal_half></data> feet</p>
+        <p>Takeoff Distance Full Flaps: <data value="" id=q_TO_normal_full></data> feet</p>
+        <p>Section Takeoff Distance: <data value="" id=q_TO_section></data> feet</p>
+        <p>Abort Dry <b>Half</b> Flaps: <data value="" id=q_abort_dry_half></data> KCAS</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(–3 for section)</p>
+        <p>Abort Dry Full Flaps: <data value="" id=q_abort_dry_full></data> KCAS</p>
+        <p>Abort Wet <b>Half</b> Flaps: <data value="" id=q_abort_wet_half></data> KCAS</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(–1 for section)</p>
+        <p>Abort Wet Full Flaps: <data value="" id=q_abort_wet_full></data> KCAS</p>
+        <p>Min RPM at MRT (within 7 seconds): <data value="" id=q_minRPM></data>%</p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <p></p>
+        <br>
+        <br>
+        <hr>
+        <br>
+        <br>
+        <h2>Calculations Based On:</h2>
+        <table><tr><td>RPM:</td>
+                <td>Pressure Altitude Sea Level</td>
+                <td>PCL Figure 2 (pg. 45)/NATOPS Figure 4-2</td></tr>
+            <tr><td>Line Speed Half Flaps:</td>
+                <td>Distance Down Runway 1500 Feet, 13,000 lb Gross Weight</td>
+                <td>PCL Figure 14/ NATOPS Figure 26-9</td></tr>
+            <tr><td>Line Speed Full Flaps:</td>
+                <td>Distance Down Runway 1500 Feet, 13,000 lb Gross Weight</td>
+                <td> PCL Figure 15/ NATOPS Figure 26-11</td></tr>
+            <tr><td>Section Line Speed:</td>
+                <td> Distance Down Runway 1500 Feet, 13,000 lb Gross Weight</td>
+                <td> PCL Figure 16/ NATOPS Figure 26-13</td></tr>
+            <tr><td>Takeoff Distance Half Flaps:</td>
+                <td> 0 kts Headwind, 13,000 lb Gross Weight</td>
+                <td> PCL Figure 11/ NATOPS Figure 26-3</td></tr>
+            <tr><td>Takeoff Distance Full Flaps:</td>
+                <td> 0 kts Headwind, 13,000 lb Gross Weight</td>
+                <td> PCL Figure 12/ NATOPS Figure 26-5</td></tr>
+            <tr><td>Section Takeoff Distance:</td>
+                <td> 0 kts Headwind, 13,000 lb Gross Weight</td>
+                <td> PCL Figure 13/ NATOPS Figure 26-7</td></tr>
+            <tr><td>Abort Dry Half Flaps:</td>
+                <td> 8000' Runway (9500' for El Centro), 13,000 lb Gross Weight </td>
+                <td> PCL Figure 17/ NATOPS Figure 26-14</td></tr>
+            <tr><td>Abort Dry Full Flaps:</td>
+                <td> 8000' Runway, 13,000 lb Gross Weight</td>
+                <td> PCL Figure 18/ NATOPS Figure 26-15</td></tr>
+            <tr><td>Abort Wet Half Flaps:</td>
+                <td> 8000' Runway (9500' for El Centro), 13,000 lb Gross Weight.</td>
+                <td> PCL Figure 19/ NATOPS Figure 26-16</td></tr>
+            <tr><td>Abort Wet Full Flaps:</td>
+                <td> 8000' Runway, 13,000 lb Gross Weight</td>
+                <td> PCL Figure 20/ NATOPS Figure 26-17</td></tr>
+            <tr><td>Min RPM at MRT:</td>
+                <td></td>
+                <td> PCL (pg. 23)</td></tr>
+            <p></p>
+            <p></p>
+            <p> Updated 15 Jun 2021 </p></div>
+    <body>
+        <div id="root">
+
+        </div>
+        <noscript>You need to enable JavaScript to run this app.</noscript>
+        <div id="root">
+        </div>
+        <script>
+            !function (e) {
+              function t(t) {
+                for (var n, a, i = t[0], c = t[1], f = t[2], s = 0, p = []; s < i.length; s++)
+                  a = i[s], Object.prototype.hasOwnProperty.call(o, a) && o[a] && p.push(o[a][0]), o[a] = 0;
+                for (n in c)
+                  Object.prototype.hasOwnProperty.call(c, n) && (e[n] = c[n]);
+                for (l && l(t); p.length; )
+                  p.shift()();
+                return u.push.apply(u, f || []), r()
+              }
+              function r() {
+                for (var e, t = 0; t < u.length; t++) {
+                  for (var r = u[t], n = !0, i = 1; i < r.length; i++) {
+                    var c = r[i];
+                    0 !== o[c] && (n = !1)
+                  }
+                  n && (u.splice(t--, 1), e = a(a.s = r[0]))
+                }
+                return e
+              }
+              var n = {}, o = {1: 0}, u = [];
+              function a(t) {
+                if (n[t])
+                  return n[t].exports;
+                var r = n[t] = {i: t, l: !1, exports: {}};
+                return e[t].call(r.exports, r, r.exports, a), r.l = !0, r.exports
+              }
+              a.e = function (e) {
+                var t = [], r = o[e];
+                if (0 !== r)
+                  if (r)
+                    t.push(r[2]);
+                  else {
+                    var n = new Promise((function (t, n) {
+                      r = o[e] = [t, n]
+                    }));
+                    t.push(r[2] = n);
+                    var u, i = document.createElement("script");
+                    i.charset = "utf-8", i.timeout = 120, a.nc && i.setAttribute("nonce", a.nc),
+                            i.src = function (e) {
+                              return a.p + "static/js/" + ({}[e] || e) + "." + {3: "4486b953"}[e] + ".chunk.js"
+                            }(e);
+                    var c = new Error;
+                    u = function (t) {
+                      i.onerror = i.onload = null, clearTimeout(f);
+                      var r = o[e];
+                      if (0 !== r) {
+                        if (r) {
+                          var n = t && ("load" === t.type ? "missing" : t.type), u = t && t.target && t.target.src;
+                          c.message = "Loading chunk " + e + " failed.\n(" + n + ": " + u + ")", c.name = "ChunkLoadError", c.type = n, c.request = u, r[1](c)
+                        }
+                        o[e] = void 0
+                      }
+                    };
+                    var f = setTimeout((function () {
+                      u({type: "timeout", target: i})
+                    }), 12e4);
+                    i.onerror = i.onload = u, document.head.appendChild(i)
+                  }
+                return Promise.all(t)
+              }, a.m = e, a.c = n, a.d = function (e, t, r) {
+                a.o(e, t) || Object.defineProperty(e, t, {enumerable: !0, get: r})
+              }, a.r = function (e) {
+                "undefined" != typeof Symbol && Symbol.toStringTag && Object.defineProperty(e, Symbol.toStringTag, {value: "Module"}), Object.defineProperty(e, "__esModule", {value: !0})
+              }, a.t = function (e, t) {
+                if (1 & t && (e = a(e)), 8 & t)
+                  return e;
+                if (4 & t && "object" == typeof e && e && e.__esModule)
+                  return e;
+                var r = Object.create(null);
+                if (a.r(r), Object.defineProperty(r, "default", {enumerable: !0, value: e}), 2 & t && "string" != typeof e)
+                  for (var n in e)
+                    a.d(r, n, function (t) {
+                      return e[t]
+                    }.bind(null, n));
+                return r
+              }, a.n = function (e) {
+                var t = e && e.__esModule ? function () {
+                  return e.default
+                } : function () {
+                  return e
+                };
+                return a.d(t, "a", t), t
+              }, a.o = function (e, t) {
+                return Object.prototype.hasOwnProperty.call(e, t)
+              }, a.p = "/", a.oe = function (e) {
+                throw console.error(e), e
+              };
+              var i = this["webpackJsonpgoshawk-takeoff"] = this["webpackJsonpgoshawk-takeoff"] || [], c = i.push.bind(i);
+              i.push = t, i = i.slice();
+              for (var f = 0; f < i.length; f++)
+                t(i[f]);
+              var l = c;
+              r()
+            }([])
+        </script>
+        <script src="js/2.0179b348.chunk.js"></script>
+        <script src="js/main.df526780.chunk.js"></script>
+
+    </body>
+
+</html>
