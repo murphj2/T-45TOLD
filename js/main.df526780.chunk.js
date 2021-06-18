@@ -1,10 +1,10 @@
 var FullWet, FullDry, HalfWet, HalfDry, AbortDR, AbortRL, MasterURL;
-var expLimit = 62;
+var expLimit = 59;
 var NQItimePulled, NMMtimePulled, NJKtimePulled, qTimePulled = 0;
 var q_DR = 0;
-var refreshing = !1;
+var refreshCount = 0;
 var time = 0;
-
+var prevStationReq = "";
 /**
  * Initializes all global variables. <br>
  * Calls update3MainFields to fetch and populate KNQI, KNMM, and KNJK. <br>
@@ -58,6 +58,21 @@ function initializeAll() {
 
   update3MainFields();
   dataEnterMethod();
+  updateManualAll();
+  
+  var now = new Date();
+  var UPDATER;
+  var millisTill = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1, 0, 500) - now;
+  millisTill < 100 ? millisTill += 60000 : millisTill;
+  updateTimeStamps();
+  setTimeout(function () {
+    updateTimeStamps();
+    UPDATER = setInterval(updateTimeStamps, 60000);//Update expiration times every minute
+  }, millisTill);//wait til top of next minute for reload
+  setTimeout(function () {
+    clearInterval(UPDATER);
+    document.getElementById("curTime").innerHTML = "TimeOut. Please reload page.";
+  }, 1800000);//30min timeout for power conservation
 }
 /**
  * Called when a key is pressed while typing in 'stationID' input tag
@@ -464,10 +479,14 @@ function dataEnterMethod() {
   var manualData = document.getElementById("entryMethod").checked;//Boolean
   if (manualData) {
     document.getElementById("airportData").style.display = 'none';
+    document.getElementById("q").style.display = 'none';
     document.getElementById("manualData").style.display = 'block';
+    document.getElementById("qM").style.display = 'block';
   } else {
     document.getElementById("airportData").style.display = 'block';
+    document.getElementById("q").style.display = 'block';
     document.getElementById("manualData").style.display = 'none';
+    document.getElementById("qM").style.display = 'none';
   }
 }
 /**
@@ -515,9 +534,10 @@ async function update3MainFields() {
   var today = new Date();
   time = pad(today.getUTCHours(), 2) + "" + pad(today.getUTCMinutes(), 2) + " Z";
   document.getElementById("refreshtime").innerHTML = time;
-
-  await fetch(MasterURL + "KNQI", {method: "get", headers: new Headers({Authorization: "-opirCS9HHLxCqKScGB9H7J5N4zoV3G4VLiCHeD5RI8"})})
-          //fetch("https://aviationweather.gov/adds/dataserver_current/httpparam?dataSource=metars&requestType=retrieve&format=xml&hoursBeforeNow=3&mostRecent=true&stationString=KNQI", {method: "GET", mode: "cors"})
+  var KNQI_URL = MasterURL + "KNQI";
+  var KNMM_URL = MasterURL + "KNMM";
+  var KNJK_URL = MasterURL + "KNJK"
+  await fetch(KNQI_URL, {method: "get", headers: new Headers({Authorization: "-opirCS9HHLxCqKScGB9H7J5N4zoV3G4VLiCHeD5RI8"})})
           .then((function (t) {
             return t.json();
           }))
@@ -549,7 +569,7 @@ async function update3MainFields() {
             NQItimePulled = j.time.dt;
           }
           ));
-  await fetch(MasterURL + "KNMM", {method: "get", headers: new Headers({Authorization: "-opirCS9HHLxCqKScGB9H7J5N4zoV3G4VLiCHeD5RI8"})})
+  await fetch(KNMM_URL, {method: "get", headers: new Headers({Authorization: "-opirCS9HHLxCqKScGB9H7J5N4zoV3G4VLiCHeD5RI8"})})
           .then((function (t) {
             return t.json();
           }))
@@ -581,7 +601,7 @@ async function update3MainFields() {
             NMMtimePulled = j.time.dt;
           }
           ));
-  await fetch(MasterURL + "KNJK", {method: "get", headers: new Headers({Authorization: "-opirCS9HHLxCqKScGB9H7J5N4zoV3G4VLiCHeD5RI8"})})
+  await fetch(KNJK_URL, {method: "get", headers: new Headers({Authorization: "-opirCS9HHLxCqKScGB9H7J5N4zoV3G4VLiCHeD5RI8"})})
           .then((function (t) {
             return t.json();
           }))
@@ -626,11 +646,16 @@ async function updateStationID() {
   var q_temp, q_altimeter, q_PA, q_fieldElev, q_stationPressure, q_RH, q_DR = 0;
 
   document.getElementById("loadingManual").style.display = 'none';
-  if (stationID !== "" || typeof stationID !== 'string') {
+  console.log(stationID);
+  console.log(prevStationReq);
+  console.log(stationID.localeCompare(prevStationReq,undefined,{ sensitivity: 'base' }));
+  console.log(document.getElementById("q_ICAO").innerHTML.includes("METAR"));
+  if ((stationID !== "" || typeof stationID !== 'string')&& stationID.localeCompare(prevStationReq,undefined,{ sensitivity: 'base' }) !==0 ) {
     document.getElementById("loadingManual").style.display = 'block';
+    console.log('here comes the fetch');
+    prevStationReq = stationID;
     await fetch(MasterURL + stationID, {method: "get", headers: new Headers({Authorization: "-opirCS9HHLxCqKScGB9H7J5N4zoV3G4VLiCHeD5RI8"})})
             .then((function (t) {
-              console.log("FETCHING");
               return t.json();
             }))
             .then((function (j) {
@@ -659,7 +684,7 @@ async function updateStationID() {
                 document.getElementById("q_TO_section").innerHTML = getSectionTO(q_DR);
                 calcStationIDAbortParams();
                 document.getElementById("q_minRPM").innerHTML = getMinRPMatMRT(q_temp, true);
-                
+
                 document.getElementById("q_metar_warn").innerHTML = diff + " minutes ago";
                 if (diff > expLimit) {
                   document.getElementById("q_warn_color").style = "color: red";
@@ -672,11 +697,13 @@ async function updateStationID() {
               }
 
             }));
-  } else {
+  } else if(!document.getElementById("q_ICAO").innerHTML.includes("METAR")){
     document.getElementById("q_ICAO").innerHTML = "*Enter valid ICAO*";
     document.getElementById("loadingManual").style.display = 'none';
   }
   document.getElementById("loadingManual").style.display = 'none';
+  console.log(document.getElementById("q_ICAO").innerHTML.includes("METAR"));
+  
 }
 /**
  * Separate method to update abort speeds for manual stationID that doesn't cost
@@ -699,41 +726,43 @@ function calcStationIDAbortParams() {
  * @returns {undefined}
  */
 function updateManualAll() {
-  document.getElementById("q_ICAO").innerHTML = "Manual Data Calculation";
-  document.getElementById("q_metar").innerHTML = "";
-  var q_RL = document.getElementById("runwayLengthManual").value / 1000;
-  var q_temp = document.getElementById("temperatureManual").value * 1;//*1 is needed to ensure that q_temp typeof is a number even when textbox is blank
-  var q_altimeter = document.getElementById("altimeter").value;
-  var q_fieldElev = document.getElementById("fieldElev").value * 1;
-  var q_PA = (29.92 - q_altimeter) * 1000 + q_fieldElev;
+  document.getElementById("qM_metar").innerHTML = "";
+  var qM_RL = document.getElementById("runwayLengthManual").value / 1000;
+  var qM_temp = document.getElementById("temperatureManual").value * 1;//*1 is needed to ensure that qM_temp typeof is a number even when textbox is blank
+  var qM_altimeter = document.getElementById("altimeter").value;
+  var qM_fieldElev = document.getElementById("fieldElev").value * 1;
+  var qM_PA = (29.92 - qM_altimeter) * 1000 + qM_fieldElev;
   var cORf = document.getElementById("cORf").checked;//true if °C selected
-  var q_stationPressure = q_altimeter * Math.exp(-0.0000366 * q_fieldElev);
-  var q_DR = getDensityRatio(q_temp, 0.5, q_stationPressure, cORf);
-  document.getElementById("q_DR").innerHTML = q_DR.toString().substring(0, 5);
-  document.getElementById("q_PA").innerHTML = Math.round(q_PA * 1);
-
-  document.getElementById("q_rpm").innerHTML = getRPM(q_PA, q_temp, cORf);
-  document.getElementById("q_line_half").innerHTML = getNormalLineSpeedHalf(q_DR);
-  document.getElementById("q_line_full").innerHTML = getNormalLineSpeedFull(q_DR);
-  document.getElementById("q_line_section").innerHTML = getSectionLineSpeed(q_DR);
-  document.getElementById("q_TO_normal_half").innerHTML = getNormalTOHalf(q_DR);
-  document.getElementById("q_TO_normal_full").innerHTML = getNormalTOFull(q_DR);
-  document.getElementById("q_TO_section").innerHTML = getSectionTO(q_DR);
-  document.getElementById("q_abort_dry_half").innerHTML = getAbortDryHalf(q_DR, q_RL);
-  document.getElementById("q_abort_dry_full").innerHTML = getAbortDryFull(q_DR, q_RL);
-  document.getElementById("q_abort_wet_half").innerHTML = getAbortWetHalf(q_DR, q_RL);
-  document.getElementById("q_abort_wet_full").innerHTML = getAbortWetFull(q_DR, q_RL);
-  document.getElementById("q_minRPM").innerHTML = getMinRPMatMRT(q_temp, cORf);
-  q_RL < 2 ? document.getElementById("RLWarning2").innerHTML = "<b>Runway Length < 2k, 2k will be used</b>"
-          : q_RL > 10 ? document.getElementById("RLWarning2").innerHTML = "<b>Runway Length < 10k, 10k will be used</b>"
+  var qM_stationPressure = qM_altimeter * Math.exp(-0.0000366 * qM_fieldElev);
+  var qM_DR = getDensityRatio(qM_temp, 0.5, qM_stationPressure, cORf);
+  document.getElementById("qM_DR").innerHTML = qM_DR.toString().substring(0, 5);
+  document.getElementById("qM_PA").innerHTML = Math.round(qM_PA * 1);
+  document.getElementById("qM_rpm").innerHTML = getRPM(qM_PA, qM_temp, cORf);
+  document.getElementById("qM_line_half").innerHTML = getNormalLineSpeedHalf(qM_DR);
+  document.getElementById("qM_line_full").innerHTML = getNormalLineSpeedFull(qM_DR);
+  document.getElementById("qM_line_section").innerHTML = getSectionLineSpeed(qM_DR);
+  document.getElementById("qM_TO_normal_half").innerHTML = getNormalTOHalf(qM_DR);
+  document.getElementById("qM_TO_normal_full").innerHTML = getNormalTOFull(qM_DR);
+  document.getElementById("qM_TO_section").innerHTML = getSectionTO(qM_DR);
+  document.getElementById("qM_abort_dry_half").innerHTML = getAbortDryHalf(qM_DR, qM_RL);
+  document.getElementById("qM_abort_dry_full").innerHTML = getAbortDryFull(qM_DR, qM_RL);
+  document.getElementById("qM_abort_wet_half").innerHTML = getAbortWetHalf(qM_DR, qM_RL);
+  document.getElementById("qM_abort_wet_full").innerHTML = getAbortWetFull(qM_DR, qM_RL);
+  document.getElementById("qM_minRPM").innerHTML = getMinRPMatMRT(qM_temp, cORf);
+  qM_RL < 2 ? document.getElementById("RLWarning2").innerHTML = "<b>Runway Length < 2k, 2k will be used</b>"
+          : qM_RL > 10 ? document.getElementById("RLWarning2").innerHTML = "<b>Runway Length < 10k, 10k will be used</b>"
           : document.getElementById("RLWarning2").innerHTML = "";
   if (cORf) {
-    document.getElementById("q_T").innerHTML = Math.round(tempConv(q_temp, cORf));
+    document.getElementById("qM_T").innerHTML = Math.round(tempConv(qM_temp, cORf));
   } else {
-    document.getElementById("q_T").innerHTML = q_temp;
+    document.getElementById("qM_T").innerHTML = qM_temp;
   }
 
 }
+/**
+ * Updates current time at top of page and 'minutes ago' tickers below all requested METARs
+ * @returns {undefined}
+ */
 function updateTimeStamps() {
   var today = new Date();
   time = pad(today.getUTCHours(), 2) + "" + pad(today.getUTCMinutes(), 2) + " Z";
@@ -762,7 +791,6 @@ function updateTimeStamps() {
   } else {
     document.getElementById("c_warn_color").style = "color: green";
   }
-console.log("Q: "+qDiff);
   document.getElementById("q_metar_warn").innerHTML = qDiff + " minutes ago";
   if (qDiff > expLimit) {
     document.getElementById("q_warn_color").style = "color: red";
@@ -770,7 +798,5 @@ console.log("Q: "+qDiff);
     document.getElementById("q_warn_color").style = "color: green";
   }
 }
-initializeAll();
 
-setInterval(updateTimeStamps, 30000);
-//# sourceMappingURL=main.df526776.chunk.js.map
+initializeAll();
