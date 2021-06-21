@@ -12,6 +12,7 @@ var prevStationReq = "";
  * selection button.
  */
 function initializeAll() {
+  
   FullWet = [
     [1.3, 2, 2.7, 3.3, 3.8, 4.35, 4.85, 5.35, 5.8],
     [1.275, 1.95, 2.6, 3.2, 3.7, 4.15, 4.65, 5.1, 5.55],
@@ -798,5 +799,26 @@ function updateTimeStamps() {
     document.getElementById("q_warn_color").style = "color: green";
   }
 }
-
+var faunadb = window.faunadb;
+  var q = faunadb.query;
+  var client = new faunadb.Client({
+    secret: 'fnAEMNWX2QACBu39K6fQQPMBEkMTq_Dp8DdnmA_a',
+    domain: 'db.fauna.com',
+    scheme: 'https'
+  });
+  client.query(
+    q.ToDate('2018-06-06')
+  )
+  .then(function (res) { console.log('Result:', res); })
+  .catch(function (err) { console.log('Error:', err); });
+  
+//var faunadb = require(['//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb.js']),
+//  q = faunadb.query;
+//  var client = new faunadb.Client({ secret: 'fnAEMNWX2QACBu39K6fQQPMBEkMTq_Dp8DdnmA_a' });//DO NOT ERASE THIS KEY!!!
+//  var createP = client.query(q.Create(
+//    q.Collection('test'),
+//    { data: { testField: 'testValue' } }
+//  )
+//);
 initializeAll();
+
