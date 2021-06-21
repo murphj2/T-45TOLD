@@ -799,15 +799,17 @@ function updateTimeStamps() {
     document.getElementById("q_warn_color").style = "color: green";
   }
 }
-var faunadb = window.faunadb;
+ const faunadb = window.faunadb;//require(['https://jspm.dev/npm:faunadb@2.14.2']);
+console.log(faunadb);
   var q = faunadb.query;
-  var client = new faunadb.Client({
-    secret: 'fnAEMNWX2QACBu39K6fQQPMBEkMTq_Dp8DdnmA_a',
-    domain: 'db.fauna.com',
-    scheme: 'https'
-  });
+var client = new faunadb.Client({ secret: 'fnAEMNWX2QACBu39K6fQQPMBEkMTq_Dp8DdnmA_a' });
+//  var client = new faunadb.Client({
+//    secret: 'fnAEMNWX2QACBu39K6fQQPMBEkMTq_Dp8DdnmA_a',
+//    domain: 'db.fauna.com',
+//    scheme: 'https'
+//  });
   client.query(
-    q.ToDate('2018-06-06')
+    q.Get(q.Ref(q.Collection("products"),"202"))
   )
   .then(function (res) { console.log('Result:', res); })
   .catch(function (err) { console.log('Error:', err); });
