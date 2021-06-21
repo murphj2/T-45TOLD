@@ -6,7 +6,7 @@ var refreshCount = 0;
 var time = 0;
 var prevStationReq = "";
 const faunadb = window.faunadb;//require(['https://jspm.dev/npm:faunadb@2.14.2']);
-console.log(faunadb);
+//console.log(faunadb);
 var q = faunadb.query;
 var client = new faunadb.Client({secret: 'fnAEMNvfLhACAE3ZIeGmc1BKpnnvTFbCs6O1c6MZ'});//DO NOT ERASE
 /**
@@ -77,6 +77,10 @@ function initializeAll() {
   setTimeout(function () {
     clearInterval(UPDATER);
     document.getElementById("curTime").innerHTML = "TimeOut. Please reload page.";
+    document.getElementById("k_metar_warn").innerHTML = "Please reload page.";
+    document.getElementById("m_metar_warn").innerHTML = "Please reload page.";
+    document.getElementById("c_metar_warn").innerHTML = "Please reload page.";
+    document.getElementById("q_metar_warn").innerHTML = "Please reload page.";
   }, 1800000);//30min timeout for power conservation
 }
 /**
@@ -535,15 +539,15 @@ async function getData(ref) {
           )
           .then(function (res) {
             result = res;
-            console.log('Result:', res);
-            console.log('Result:', result);
+            //console.log('Result:', res);
+            //console.log('Result:', result);
             //curCount = res.data.count;
 
           })
           .catch(function (err) {
             console.log('Error:', err);
           });
-  console.log(result);
+  //console.log(result);
   return result;
 }
 function updateData(ref, update) {
@@ -557,22 +561,49 @@ async function addXtoFetchCounter(x) {
 //    scheme: 'https'
 //  });
 
-  var response = await getData(q.Ref(q.Collection("SavedMetars"), "301982873586500100")) ;
-    console.log(response);
+  var response = await getData(q.Ref(q.Collection("SavedMetars"), "301982873586500100"));
+    //console.log(response);
     var curCount = response.data.count;
-    client.query(
+    var now = new Date();
+    var resT = new Date(response.ts/1000);
+    //console.log(now);
+    //console.log(resT.getDate());
+    if(now.getDate() !== resT.getDate()){
+      console.log("Resetting Daily Count");
+      client.query(
             q.Update(
                     q.Ref(q.Collection('SavedMetars'), '301982873586500100'),
                     {
                       data: {
-                        count: curCount + x
+                        count: x,
+                        lastUpdateTime: Date.now()
                       }
                     },
                     )
             )
             .then((ret) => console.log(ret))
             .catch((err) => console.error('Error: %s', err));
+            updateTimeStamps();
   ;
+    }else{
+    console.log("Updating Daily Count");
+    client.query(
+            q.Update(
+                    q.Ref(q.Collection('SavedMetars'), '301982873586500100'),
+                    {
+                      data: {
+                        count: curCount + x,
+                        lastUpdateTime: Date.now()
+                      }
+                    },
+                    )
+                    
+            )
+            .then((ret) => console.log(ret))
+            .catch((err) => console.error('Error: %s', err));
+            updateTimeStamps();
+  ;}
+  
 }
 /**
  * Fetches and populates KNQI, KNMM, KNJK METAR and TOLD data.
@@ -852,7 +883,7 @@ async function updateTimeStamps() {
     document.getElementById("q_warn_color").style = "color: green";
   }
   var res = await getData(q.Ref(q.Collection("SavedMetars"), "301982873586500100"));
-  console.log(q.Date(res.ts));
+  //console.log(new Date(res.ts/1000));
   document.getElementById("fetches").innerHTML = res.data.count;
 }
 
