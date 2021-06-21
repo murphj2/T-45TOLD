@@ -5,6 +5,10 @@ var q_DR = 0;
 var refreshCount = 0;
 var time = 0;
 var prevStationReq = "";
+const faunadb = window.faunadb;//require(['https://jspm.dev/npm:faunadb@2.14.2']);
+console.log(faunadb);
+var q = faunadb.query;
+var client = new faunadb.Client({secret: 'fnAEMNvfLhACAE3ZIeGmc1BKpnnvTFbCs6O1c6MZ'});//DO NOT ERASE
 /**
  * Initializes all global variables. <br>
  * Calls update3MainFields to fetch and populate KNQI, KNMM, and KNJK. <br>
@@ -12,7 +16,7 @@ var prevStationReq = "";
  * selection button.
  */
 function initializeAll() {
-  
+
   FullWet = [
     [1.3, 2, 2.7, 3.3, 3.8, 4.35, 4.85, 5.35, 5.8],
     [1.275, 1.95, 2.6, 3.2, 3.7, 4.15, 4.65, 5.1, 5.55],
@@ -60,7 +64,7 @@ function initializeAll() {
   update3MainFields();
   dataEnterMethod();
   updateManualAll();
-  
+
   var now = new Date();
   var UPDATER;
   var millisTill = new Date(now.getFullYear(), now.getMonth(), now.getDate(), now.getHours(), now.getMinutes() + 1, 0, 500) - now;
@@ -524,6 +528,52 @@ function getStationPressure(altimeter, fieldElev) {
 function getFieldElev(altimeter, PA) {
   return PA - (1000 * (29.92 - altimeter));
 }
+async function getData(ref) {
+  var result = null;
+  await client.query(
+          q.Get(ref)
+          )
+          .then(function (res) {
+            result = res;
+            console.log('Result:', res);
+            console.log('Result:', result);
+            //curCount = res.data.count;
+
+          })
+          .catch(function (err) {
+            console.log('Error:', err);
+          });
+  console.log(result);
+  return result;
+}
+function updateData(ref, update) {
+
+}
+async function addXtoFetchCounter(x) {
+
+//  var client = new faunadb.Client({
+//    secret: 'fnAEMNWX2QACBu39K6fQQPMBEkMTq_Dp8DdnmA_a',
+//    domain: 'db.fauna.com',
+//    scheme: 'https'
+//  });
+
+  var response = await getData(q.Ref(q.Collection("SavedMetars"), "301982873586500100")) ;
+    console.log(response);
+    var curCount = response.data.count;
+    client.query(
+            q.Update(
+                    q.Ref(q.Collection('SavedMetars'), '301982873586500100'),
+                    {
+                      data: {
+                        count: curCount + x
+                      }
+                    },
+                    )
+            )
+            .then((ret) => console.log(ret))
+            .catch((err) => console.error('Error: %s', err));
+  ;
+}
 /**
  * Fetches and populates KNQI, KNMM, KNJK METAR and TOLD data.
  * Async function allows "Loading" header to be displayed until all fetches have 
@@ -633,6 +683,7 @@ async function update3MainFields() {
             NJKtimePulled = j.time.dt;
           }
           ));
+  addXtoFetchCounter(3);
   updateTimeStamps();
   document.getElementById("loading").style.display = 'none';
 }
@@ -649,14 +700,15 @@ async function updateStationID() {
   document.getElementById("loadingManual").style.display = 'none';
   console.log(stationID);
   console.log(prevStationReq);
-  console.log(stationID.localeCompare(prevStationReq,undefined,{ sensitivity: 'base' }));
+  console.log(stationID.localeCompare(prevStationReq, undefined, {sensitivity: 'base'}));
   console.log(document.getElementById("q_ICAO").innerHTML.includes("METAR"));
-  if ((stationID !== "" || typeof stationID !== 'string')&& stationID.localeCompare(prevStationReq,undefined,{ sensitivity: 'base' }) !==0 ) {
+  if ((stationID !== "" || typeof stationID !== 'string') && stationID.localeCompare(prevStationReq, undefined, {sensitivity: 'base'}) !== 0) {
     document.getElementById("loadingManual").style.display = 'block';
     console.log('here comes the fetch');
     prevStationReq = stationID;
     await fetch(MasterURL + stationID, {method: "get", headers: new Headers({Authorization: "-opirCS9HHLxCqKScGB9H7J5N4zoV3G4VLiCHeD5RI8"})})
             .then((function (t) {
+              addXtoFetchCounter(1);
               return t.json();
             }))
             .then((function (j) {
@@ -698,13 +750,13 @@ async function updateStationID() {
               }
 
             }));
-  } else if(!document.getElementById("q_ICAO").innerHTML.includes("METAR")){
+  } else if (!document.getElementById("q_ICAO").innerHTML.includes("METAR")) {
     document.getElementById("q_ICAO").innerHTML = "*Enter valid ICAO*";
     document.getElementById("loadingManual").style.display = 'none';
   }
   document.getElementById("loadingManual").style.display = 'none';
   console.log(document.getElementById("q_ICAO").innerHTML.includes("METAR"));
-  
+
 }
 /**
  * Separate method to update abort speeds for manual stationID that doesn't cost
@@ -764,7 +816,8 @@ function updateManualAll() {
  * Updates current time at top of page and 'minutes ago' tickers below all requested METARs
  * @returns {undefined}
  */
-function updateTimeStamps() {
+async function updateTimeStamps() {
+
   var today = new Date();
   time = pad(today.getUTCHours(), 2) + "" + pad(today.getUTCMinutes(), 2) + " Z";
   document.getElementById("curTime").innerHTML = time;
@@ -798,22 +851,12 @@ function updateTimeStamps() {
   } else {
     document.getElementById("q_warn_color").style = "color: green";
   }
+  var res = await getData(q.Ref(q.Collection("SavedMetars"), "301982873586500100"));
+  console.log(q.Date(res.ts));
+  document.getElementById("fetches").innerHTML = res.data.count;
 }
- const faunadb = window.faunadb;//require(['https://jspm.dev/npm:faunadb@2.14.2']);
-console.log(faunadb);
-  var q = faunadb.query;
-var client = new faunadb.Client({ secret: 'fnAEMNWX2QACBu39K6fQQPMBEkMTq_Dp8DdnmA_a' });
-//  var client = new faunadb.Client({
-//    secret: 'fnAEMNWX2QACBu39K6fQQPMBEkMTq_Dp8DdnmA_a',
-//    domain: 'db.fauna.com',
-//    scheme: 'https'
-//  });
-  client.query(
-    q.Get(q.Ref(q.Collection("products"),"202"))
-  )
-  .then(function (res) { console.log('Result:', res); })
-  .catch(function (err) { console.log('Error:', err); });
-  
+
+
 //var faunadb = require(['//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb.js']),
 //  q = faunadb.query;
 //  var client = new faunadb.Client({ secret: 'fnAEMNWX2QACBu39K6fQQPMBEkMTq_Dp8DdnmA_a' });//DO NOT ERASE THIS KEY!!!
