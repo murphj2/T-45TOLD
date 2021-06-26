@@ -569,7 +569,7 @@ async function addXtoFetchCounter(x) {
     //console.log(now);
     //console.log(resT.getDate());
     if(now.getDate() !== resT.getDate()){
-      console.log("Resetting Daily Count");
+      //console.log("Resetting Daily Count");
       client.query(
             q.Update(
                     q.Ref(q.Collection('SavedMetars'), '301982873586500100'),
@@ -586,7 +586,7 @@ async function addXtoFetchCounter(x) {
             updateTimeStamps();
   ;
     }else{
-    console.log("Updating Daily Count");
+    //console.log("Updating Daily Count");
     client.query(
             q.Update(
                     q.Ref(q.Collection('SavedMetars'), '301982873586500100'),
@@ -604,6 +604,22 @@ async function addXtoFetchCounter(x) {
             updateTimeStamps();
   ;}
   
+}
+/**
+ * Calculate crosswind component magnitude
+ * @param {type} dir    (°M) wind direction 
+ * @param {type} speed  (kts) wind speed 
+ * @param {type} gust   (kts) reported gust (0 if null)
+ * @param {type} rwyHdg (°M) runway heading
+ * @returns {Number}
+ */
+function calcEffXwind(dir, speed, gust, rwyHdg){
+  var eff = speed;
+  if (gust !== 0){
+     eff = (speed+gust)/2;
+  }
+  var xwRatio = Math.abs(Math.sin((rwyHdg-dir)*(Math.PI/180)));
+  return eff*xwRatio;
 }
 /**
  * Fetches and populates KNQI, KNMM, KNJK METAR and TOLD data.
@@ -625,6 +641,7 @@ async function update3MainFields() {
           }))
           .then((function (j) {
             NQIdone = true;
+            //console.log(j);
             var k_metar = document.getElementById("k_metar").innerHTML = j.raw;
             var k_temp = j.temperature.value;
             var k_altimeter = j.altimeter.value;
@@ -633,6 +650,18 @@ async function update3MainFields() {
             var k_stationPressure = getStationPressure(k_altimeter, k_fieldElev);
             var k_RH = j.relative_humidity;
             var k_DR = getDensityRatio(k_temp, k_RH, k_stationPressure, true);
+            var k_dir = j.wind_direction.value;
+            var k_windSpd = j.wind_speed.value;
+            var k_gust = j.wind_gust;
+            if (k_gust === null){
+              k_gust = 0;
+            }else{
+              k_gust = k_gust.value;
+            }
+            var XW1331 = Math.round(calcEffXwind(k_dir, k_windSpd, k_gust, 130));
+            var XW1735 = Math.round(calcEffXwind(k_dir, k_windSpd, k_gust, 175));
+            document.getElementById("k_13/31XW").innerHTML=XW1331;
+            document.getElementById("k_17/35XW").innerHTML=XW1735;
             document.getElementById("k_DR").innerHTML = k_DR.toString().substring(0, 5);
             document.getElementById("k_PA").innerHTML = k_PA;
             document.getElementById("k_T").innerHTML = Math.round(tempConv(k_temp, true));
@@ -665,6 +694,18 @@ async function update3MainFields() {
             var m_stationPressure = getStationPressure(m_altimeter, m_fieldElev);
             var m_RH = j.relative_humidity;
             var m_DR = getDensityRatio(m_temp, m_RH, m_stationPressure, true);
+            var m_dir = j.wind_direction.value;
+            var m_windSpd = j.wind_speed.value;
+            var m_gust = j.wind_gust;
+            if (m_gust === null){
+              m_gust = 0;
+            }else{
+              m_gust = m_gust.value;
+            }
+            var XW0119 = Math.round(calcEffXwind(m_dir, m_windSpd, m_gust, 191));
+            var XW1028 = Math.round(calcEffXwind(m_dir, m_windSpd, m_gust, 101));
+            document.getElementById("m_01/19XW").innerHTML=XW0119;
+            document.getElementById("m_10/28XW").innerHTML=XW1028;
             document.getElementById("m_DR").innerHTML = m_DR.toString().substring(0, 5);
             document.getElementById("m_PA").innerHTML = m_PA;
             document.getElementById("m_T").innerHTML = Math.round(tempConv(m_temp, true));
@@ -689,6 +730,7 @@ async function update3MainFields() {
           }))
           .then((function (j) {
             NJKdone = true;
+            //console.log(j);
             var c_metar = document.getElementById("c_metar").innerHTML = j.raw;
             var c_temp = j.temperature.value;
             var c_altimeter = j.altimeter.value;
@@ -697,6 +739,19 @@ async function update3MainFields() {
             var c_fieldElev = getFieldElev(c_altimeter, c_PA);
             var c_stationPressure = getStationPressure(c_altimeter, c_fieldElev);
             var c_DR = getDensityRatio(c_temp, c_RH, c_stationPressure, true);
+            var c_dir = j.wind_direction.value;
+            var c_windSpd = j.wind_speed.value;
+            var c_gust = j.wind_gust;
+            if (c_gust === null){
+              c_gust = 0;
+            }else{
+              c_gust = c_gust.value;
+            }
+            var XW1230 = Math.round(calcEffXwind(c_dir, c_windSpd, c_gust, 124));
+            var XW0826 = Math.round(calcEffXwind(c_dir, c_windSpd, c_gust, 260));
+            document.getElementById("c_12/30XW").innerHTML=XW1230;
+            document.getElementById("c_08/26XW").innerHTML=XW0826;
+            //console.log(XW1230);
             document.getElementById("c_DR").innerHTML = c_DR.toString().substring(0, 5);
             document.getElementById("c_PA").innerHTML = c_PA;
             document.getElementById("c_T").innerHTML = Math.round(tempConv(c_temp, true));
@@ -729,10 +784,10 @@ async function updateStationID() {
   var q_temp, q_altimeter, q_PA, q_fieldElev, q_stationPressure, q_RH, q_DR = 0;
 
   document.getElementById("loadingManual").style.display = 'none';
-  console.log(stationID);
-  console.log(prevStationReq);
-  console.log(stationID.localeCompare(prevStationReq, undefined, {sensitivity: 'base'}));
-  console.log(document.getElementById("q_ICAO").innerHTML.includes("METAR"));
+  //console.log(stationID);
+  //console.log(prevStationReq);
+  //console.log(stationID.localeCompare(prevStationReq, undefined, {sensitivity: 'base'}));
+  //console.log(document.getElementById("q_ICAO").innerHTML.includes("METAR"));
   if ((stationID !== "" || typeof stationID !== 'string') && stationID.localeCompare(prevStationReq, undefined, {sensitivity: 'base'}) !== 0) {
     document.getElementById("loadingManual").style.display = 'block';
     console.log('here comes the fetch');
@@ -744,6 +799,7 @@ async function updateStationID() {
             }))
             .then((function (j) {
               if (typeof j.error === 'undefined') {
+                console.log(j);
                 document.getElementById("q_metar_warn").style.display = 'block'
                 var q_ICAO = document.getElementById("q_ICAO").innerHTML = j.station + " METAR";
                 var q_metar = document.getElementById("q_metar").innerHTML = j.raw;
@@ -786,7 +842,7 @@ async function updateStationID() {
     document.getElementById("loadingManual").style.display = 'none';
   }
   document.getElementById("loadingManual").style.display = 'none';
-  console.log(document.getElementById("q_ICAO").innerHTML.includes("METAR"));
+  //console.log(document.getElementById("q_ICAO").innerHTML.includes("METAR"));
 
 }
 /**
