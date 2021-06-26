@@ -658,8 +658,8 @@ async function update3MainFields() {
             }else{
               k_gust = k_gust.value;
             }
-            var XW1331 = Math.round(calcEffXwind(k_dir, k_windSpd, k_gust, 130));
-            var XW1735 = Math.round(calcEffXwind(k_dir, k_windSpd, k_gust, 175));
+            var XW1331 = roundToxPlaces(calcEffXwind(k_dir, k_windSpd, k_gust, 130),1);
+            var XW1735 = roundToxPlaces(calcEffXwind(k_dir, k_windSpd, k_gust, 175),1);
             document.getElementById("k_13/31XW").innerHTML=XW1331;
             document.getElementById("k_17/35XW").innerHTML=XW1735;
             document.getElementById("k_DR").innerHTML = k_DR.toString().substring(0, 5);
@@ -702,8 +702,8 @@ async function update3MainFields() {
             }else{
               m_gust = m_gust.value;
             }
-            var XW0119 = Math.round(calcEffXwind(m_dir, m_windSpd, m_gust, 191));
-            var XW1028 = Math.round(calcEffXwind(m_dir, m_windSpd, m_gust, 101));
+            var XW0119 = roundToxPlaces(calcEffXwind(m_dir, m_windSpd, m_gust, 191),1);
+            var XW1028 = roundToxPlaces(calcEffXwind(m_dir, m_windSpd, m_gust, 101),1);
             document.getElementById("m_01/19XW").innerHTML=XW0119;
             document.getElementById("m_10/28XW").innerHTML=XW1028;
             document.getElementById("m_DR").innerHTML = m_DR.toString().substring(0, 5);
@@ -747,8 +747,8 @@ async function update3MainFields() {
             }else{
               c_gust = c_gust.value;
             }
-            var XW1230 = Math.round(calcEffXwind(c_dir, c_windSpd, c_gust, 124));
-            var XW0826 = Math.round(calcEffXwind(c_dir, c_windSpd, c_gust, 260));
+            var XW1230 = roundToxPlaces(calcEffXwind(c_dir, c_windSpd, c_gust, 124),1);
+            var XW0826 = roundToxPlaces(calcEffXwind(c_dir, c_windSpd, c_gust, 260),1);
             document.getElementById("c_12/30XW").innerHTML=XW1230;
             document.getElementById("c_08/26XW").innerHTML=XW0826;
             //console.log(XW1230);
