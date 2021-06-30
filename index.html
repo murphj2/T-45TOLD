@@ -121,6 +121,8 @@ and open the template in the editor.
             <p></p>
             <label for="runwaylength">Runway Length (feet): </label>
             <input id=runwayLength type="number" min="2000" max="10000" step="100"  value="8000"  oninput="calcStationIDAbortParams()">
+            <label for="runwaylength">Runway Heading (°M): </label>
+            <input id=runwayHdg type="number"  step="10"  value="360"  oninput="calcStationIDAbortParams()">
             <p style="color:red; font-size: smaller">
                 <data value="" id="RLWarning1"></data></p>
             <p></p>
@@ -168,6 +170,7 @@ and open the template in the editor.
             <p>Abort Wet <b>Half</b> Flaps: <data value="" id=q_abort_wet_half></data> KCAS</p><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;(–1 for section)</p>
             <p>Abort Wet Full Flaps: <data value="" id=q_abort_wet_full></data> KCAS</p>
             <p>Min RPM at MRT (within 7 seconds): <data value="" id=q_minRPM></data>%</p>
+            <p style="font-size: small"><data id="Rwys"></data> <data value="" id=q_xW></data> kts x-wind</p>
             <p style="font-size: small">Pressure Altitude: <data value="" id=q_PA></data></p>
             <p style="font-size: small">Temp (°F): <data value="" id=q_T></data></p>
             <p style="font-size: small">Density Ratio: <data value="" id=q_DR></data></p>

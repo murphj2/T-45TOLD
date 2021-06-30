@@ -2,6 +2,9 @@ var FullWet, FullDry, HalfWet, HalfDry, AbortDR, AbortRL, MasterURL;
 var expLimit = 59;
 var NQItimePulled, NMMtimePulled, NJKtimePulled, qTimePulled = 0;
 var q_DR = 0;
+var q_dir = 0;
+var q_speed = 0;
+var q_gust = 0;
 var refreshCount = 0;
 var time = 0;
 var prevStationReq = "";
@@ -562,15 +565,15 @@ async function addXtoFetchCounter(x) {
 //  });
 
   var response = await getData(q.Ref(q.Collection("SavedMetars"), "301982873586500100"));
-    //console.log(response);
-    var curCount = response.data.count;
-    var now = new Date();
-    var resT = new Date(response.ts/1000);
-    //console.log(now);
-    //console.log(resT.getDate());
-    if(now.getDate() !== resT.getDate()){
-      //console.log("Resetting Daily Count");
-      client.query(
+  //console.log(response);
+  var curCount = response.data.count;
+  var now = new Date();
+  var resT = new Date(response.ts / 1000);
+  //console.log(now);
+  //console.log(resT.getDate());
+  if (now.getDate() !== resT.getDate()) {
+    //console.log("Resetting Daily Count");
+    client.query(
             q.Update(
                     q.Ref(q.Collection('SavedMetars'), '301982873586500100'),
                     {
@@ -583,9 +586,9 @@ async function addXtoFetchCounter(x) {
             )
             .then((ret) => console.log(ret))
             .catch((err) => console.error('Error: %s', err));
-            updateTimeStamps();
-  ;
-    }else{
+    updateTimeStamps();
+    ;
+  } else {
     //console.log("Updating Daily Count");
     client.query(
             q.Update(
@@ -597,13 +600,14 @@ async function addXtoFetchCounter(x) {
                       }
                     },
                     )
-                    
+
             )
             .then((ret) => console.log(ret))
             .catch((err) => console.error('Error: %s', err));
-            updateTimeStamps();
-  ;}
-  
+    updateTimeStamps();
+    ;
+  }
+
 }
 /**
  * Calculate crosswind component magnitude
@@ -613,13 +617,13 @@ async function addXtoFetchCounter(x) {
  * @param {type} rwyHdg (°M) runway heading
  * @returns {Number}
  */
-function calcEffXwind(dir, speed, gust, rwyHdg){
+function calcEffXwind(dir, speed, gust, rwyHdg) {
   var eff = speed;
-  if (gust !== 0){
-     eff = (speed+gust)/2;
+  if (gust !== 0) {
+    eff = (speed + gust) / 2;
   }
-  var xwRatio = Math.abs(Math.sin((rwyHdg-dir)*(Math.PI/180)));
-  return eff*xwRatio;
+  var xwRatio = Math.abs(Math.sin((rwyHdg - dir) * (Math.PI / 180)));
+  return roundToxPlaces(eff * xwRatio, 1);
 }
 /**
  * Fetches and populates KNQI, KNMM, KNJK METAR and TOLD data.
@@ -653,15 +657,15 @@ async function update3MainFields() {
             var k_dir = j.wind_direction.value;
             var k_windSpd = j.wind_speed.value;
             var k_gust = j.wind_gust;
-            if (k_gust === null){
+            if (k_gust === null) {
               k_gust = 0;
-            }else{
+            } else {
               k_gust = k_gust.value;
             }
-            var XW1331 = roundToxPlaces(calcEffXwind(k_dir, k_windSpd, k_gust, 130),1);
-            var XW1735 = roundToxPlaces(calcEffXwind(k_dir, k_windSpd, k_gust, 175),1);
-            document.getElementById("k_13/31XW").innerHTML=XW1331;
-            document.getElementById("k_17/35XW").innerHTML=XW1735;
+            var XW1331 = calcEffXwind(k_dir, k_windSpd, k_gust, 130);
+            var XW1735 = calcEffXwind(k_dir, k_windSpd, k_gust, 175);
+            document.getElementById("k_13/31XW").innerHTML = XW1331;
+            document.getElementById("k_17/35XW").innerHTML = XW1735;
             document.getElementById("k_DR").innerHTML = k_DR.toString().substring(0, 5);
             document.getElementById("k_PA").innerHTML = k_PA;
             document.getElementById("k_T").innerHTML = Math.round(tempConv(k_temp, true));
@@ -697,15 +701,15 @@ async function update3MainFields() {
             var m_dir = j.wind_direction.value;
             var m_windSpd = j.wind_speed.value;
             var m_gust = j.wind_gust;
-            if (m_gust === null){
+            if (m_gust === null) {
               m_gust = 0;
-            }else{
+            } else {
               m_gust = m_gust.value;
             }
-            var XW0119 = roundToxPlaces(calcEffXwind(m_dir, m_windSpd, m_gust, 191),1);
-            var XW1028 = roundToxPlaces(calcEffXwind(m_dir, m_windSpd, m_gust, 101),1);
-            document.getElementById("m_01/19XW").innerHTML=XW0119;
-            document.getElementById("m_10/28XW").innerHTML=XW1028;
+            var XW0119 = calcEffXwind(m_dir, m_windSpd, m_gust, 191);
+            var XW1028 = calcEffXwind(m_dir, m_windSpd, m_gust, 101);
+            document.getElementById("m_01/19XW").innerHTML = XW0119;
+            document.getElementById("m_10/28XW").innerHTML = XW1028;
             document.getElementById("m_DR").innerHTML = m_DR.toString().substring(0, 5);
             document.getElementById("m_PA").innerHTML = m_PA;
             document.getElementById("m_T").innerHTML = Math.round(tempConv(m_temp, true));
@@ -742,15 +746,15 @@ async function update3MainFields() {
             var c_dir = j.wind_direction.value;
             var c_windSpd = j.wind_speed.value;
             var c_gust = j.wind_gust;
-            if (c_gust === null){
+            if (c_gust === null) {
               c_gust = 0;
-            }else{
+            } else {
               c_gust = c_gust.value;
             }
-            var XW1230 = roundToxPlaces(calcEffXwind(c_dir, c_windSpd, c_gust, 124),1);
-            var XW0826 = roundToxPlaces(calcEffXwind(c_dir, c_windSpd, c_gust, 260),1);
-            document.getElementById("c_12/30XW").innerHTML=XW1230;
-            document.getElementById("c_08/26XW").innerHTML=XW0826;
+            var XW1230 = calcEffXwind(c_dir, c_windSpd, c_gust, 124);
+            var XW0826 = calcEffXwind(c_dir, c_windSpd, c_gust, 260);
+            document.getElementById("c_12/30XW").innerHTML = XW1230;
+            document.getElementById("c_08/26XW").innerHTML = XW0826;
             //console.log(XW1230);
             document.getElementById("c_DR").innerHTML = c_DR.toString().substring(0, 5);
             document.getElementById("c_PA").innerHTML = c_PA;
@@ -772,6 +776,12 @@ async function update3MainFields() {
   addXtoFetchCounter(3);
   updateTimeStamps();
   document.getElementById("loading").style.display = 'none';
+}
+function getRecip(rwyHdg) {
+  if (rwyHdg <= 18) {
+    return pad(rwyHdg + 18,2);
+  }
+  return pad(rwyHdg - 18,2);
 }
 /**
  * Called when Submit clicked, runway length changed, or 'Enter' key pressed 
@@ -800,7 +810,7 @@ async function updateStationID() {
             .then((function (j) {
               if (typeof j.error === 'undefined') {
                 console.log(j);
-                document.getElementById("q_metar_warn").style.display = 'block'
+                document.getElementById("q_metar_warn").style.display = 'block';
                 var q_ICAO = document.getElementById("q_ICAO").innerHTML = j.station + " METAR";
                 var q_metar = document.getElementById("q_metar").innerHTML = j.raw;
                 var q_temp = j.temperature.value;
@@ -809,6 +819,19 @@ async function updateStationID() {
                 var q_fieldElev = getFieldElev(q_altimeter, q_PA);
                 var q_stationPressure = getStationPressure(q_altimeter, q_fieldElev);
                 var q_RH = j.relative_humidity;
+                q_dir = j.wind_direction.value;
+                q_speed = j.wind_speed.value;
+                q_gust = j.wind_gust;
+                if (q_gust === null) {
+                  q_gust = 0;
+                } else {
+                  q_gust = q_gust.value;
+                }
+                var rwyHdg = document.getElementById("runwayHdg").value;
+                var xW = calcEffXwind(q_dir, q_speed, q_gust, rwyHdg);
+                var roundedRWY = Math.round(rwyHdg / 10) * 10;
+                document.getElementById("Rwys").innerHTML = roundedRWY + "/" + getRecip(roundedRWY);
+                document.getElementById("q_xW").innerHTML = xW;
                 q_DR = getDensityRatio(q_temp, q_RH, q_stationPressure, true);
                 qTimePulled = j.time.dt;
                 var diff = minutesBetween(j.time.dt);
@@ -853,9 +876,15 @@ async function updateStationID() {
  */
 function calcStationIDAbortParams() {
   var q_RL = document.getElementById("runwayLength").value / 1000;
+  var rwyHdg = document.getElementById("runwayHdg").value;
   q_RL < 2 ? document.getElementById("RLWarning1").innerHTML = "<b>Runway Length < 2k, 2k will be used</b>"
           : q_RL > 10 ? document.getElementById("RLWarning1").innerHTML = "<b>Runway Length > 10k, 10k will be used</b>"
           : document.getElementById("RLWarning1").innerHTML = "";
+  var rwyHdg = document.getElementById("runwayHdg").value;
+  var xW = calcEffXwind(q_dir, q_speed, q_gust, rwyHdg);
+  var roundedRWY = Math.round(rwyHdg / 10);
+  document.getElementById("Rwys").innerHTML = pad(roundedRWY,2) + "/" + getRecip(roundedRWY);
+  document.getElementById("q_xW").innerHTML = xW;
   document.getElementById("q_abort_dry_half").innerHTML = getAbortDryHalf(q_DR, q_RL);
   document.getElementById("q_abort_dry_full").innerHTML = getAbortDryFull(q_DR, q_RL);
   document.getElementById("q_abort_wet_half").innerHTML = getAbortWetHalf(q_DR, q_RL);
@@ -943,11 +972,11 @@ async function updateTimeStamps() {
   document.getElementById("fetches").innerHTML = res.data.count;
 }
 
-function getLAWsetting(){
+function getLAWsetting() {
   var fieldE = document.getElementById("LAWfieldElev").value;
   var stepdown = document.getElementById("stepdown").value;
-  var LAW = (stepdown-fieldE)*.9;
-  document.getElementById("LAWsetting").innerHTML = Math.round(LAW/10)*10;
+  var LAW = (stepdown - fieldE) * .9;
+  document.getElementById("LAWsetting").innerHTML = Math.round(LAW / 10) * 10;
 }
 
 //var faunadb = require(['//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb.js']),
