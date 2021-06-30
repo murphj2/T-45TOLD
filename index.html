@@ -206,7 +206,8 @@ and open the template in the editor.
         <br>
         <br>
         <h2>Calculations Based On:</h2>
-        <table><tr><td>RPM:</td>
+        <table>
+            <tr><td>RPM:</td>
                 <td>Pressure Altitude Sea Level</td>
                 <td>PCL Figure 2 (pg. 45)/NATOPS Figure 4-2</td></tr>
             <tr><td>Line Speed Half Flaps:</td>
@@ -242,10 +243,20 @@ and open the template in the editor.
             <tr><td>Min RPM at MRT:</td>
                 <td></td>
                 <td> PCL pg. 23/NATOPS pg. 7-24</td></tr>
+        </table>
             <p></p>
             <p></p>
+            <br>
             <p style="font-size: small">Fetch Count: <data id ='fetches'></data></p>
             <p> Updated 15 Jun 2021</p>
+            <br>
+            <p>LAW Setting: <data value="" id=LAWsetting></data></p>
+            <label for="LAWfieldElev">Field Elevation (MSL): </label>
+            <input id=LAWfieldElev type="number" value="50" oninput=getLAWsetting() max="15000">
+            <p></p>
+            <label for="stepdown">Stepdown Altitude: </label>
+            <input id=stepdown type="number" step ="100"  value="2000" oninput=getLAWsetting()>
+            
     </div>
     <body>
 

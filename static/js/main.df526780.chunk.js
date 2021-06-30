@@ -943,6 +943,12 @@ async function updateTimeStamps() {
   document.getElementById("fetches").innerHTML = res.data.count;
 }
 
+function getLAWsetting(){
+  var fieldE = document.getElementById("LAWfieldElev").value;
+  var stepdown = document.getElementById("stepdown").value;
+  var LAW = (stepdown-fieldE)*.9;
+  document.getElementById("LAWsetting").innerHTML = Math.round(LAW/10)*10;
+}
 
 //var faunadb = require(['//cdn.jsdelivr.net/npm/faunadb@latest/dist/faunadb.js']),
 //  q = faunadb.query;
