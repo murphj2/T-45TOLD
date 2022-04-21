@@ -745,7 +745,7 @@ async function update3MainFields() {
             var c_RH = j.relative_humidity;
             var c_fieldElev = getFieldElev(c_altimeter, c_PA);
             var c_stationPressure = getStationPressure(c_altimeter, c_fieldElev);
-    if(c_temp != null){
+    if(c_temp !== null){
             var c_DR = getDensityRatio(c_temp, c_RH, c_stationPressure, true);
     
             var c_dir = j.wind_direction.value;
