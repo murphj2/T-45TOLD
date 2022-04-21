@@ -156,7 +156,7 @@ function getRPM(PA, temp, tempIsC) {
 function getDensityRatio(temp, RH, stationPressure, tempIsC) {
   var dr;
   TEMPTEST = temp;
-  System.out.println(temp);
+  Console.log(temp);
   if (!tempIsC) {
     temp = tempConv(temp, false);
   }
