@@ -745,7 +745,9 @@ async function update3MainFields() {
             var c_RH = j.relative_humidity;
             var c_fieldElev = getFieldElev(c_altimeter, c_PA);
             var c_stationPressure = getStationPressure(c_altimeter, c_fieldElev);
+    if(c_temp != null){
             var c_DR = getDensityRatio(c_temp, c_RH, c_stationPressure, true);
+    
             var c_dir = j.wind_direction.value;
             var c_windSpd = j.wind_speed.value;
             var c_gust = j.wind_gust;
@@ -772,7 +774,9 @@ async function update3MainFields() {
             document.getElementById("c_abort_dry_half").innerHTML = getAbortDryHalf(c_DR, 9.5);
             document.getElementById("c_abort_wet_half").innerHTML = getAbortWetHalf(c_DR, 9.5);
             document.getElementById("c_minRPM").innerHTML = getMinRPMatMRT(c_temp, true);
-
+    }else{
+      document.getElementById("m_metar_warn").innerHTML = "Temperature data invalid or unavailable. Please use manual calculator below";
+    }
             NJKtimePulled = j.time.dt;
           }
           ));
