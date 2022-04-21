@@ -8,6 +8,7 @@ var q_gust = 0;
 var refreshCount = 0;
 var time = 0;
 var prevStationReq = "";
+var TEMPTEST = 0;
 const faunadb = window.faunadb;//require(['https://jspm.dev/npm:faunadb@2.14.2']);
 //console.log(faunadb);
 var q = faunadb.query;
@@ -154,6 +155,7 @@ function getRPM(PA, temp, tempIsC) {
  */
 function getDensityRatio(temp, RH, stationPressure, tempIsC) {
   var dr;
+  TEMPTEST = temp;
   if (!tempIsC) {
     temp = tempConv(temp, false);
   }
