@@ -745,10 +745,7 @@ async function update3MainFields() {
             var c_RH = j.relative_humidity;
             var c_fieldElev = getFieldElev(c_altimeter, c_PA);
             var c_stationPressure = getStationPressure(c_altimeter, c_fieldElev);
-<<<<<<< HEAD
-    if(c_temp !== null){
-=======
->>>>>>> parent of 4a44e7b (Update main.df526780.chunk.js)
+
             var c_DR = getDensityRatio(c_temp, c_RH, c_stationPressure, true);
             var c_dir = j.wind_direction.value;
             var c_windSpd = j.wind_speed.value;
